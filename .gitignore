@@ -1,0 +1,4 @@
+# Ignorar todo — solo se trackea el archivo objetivo del canal C9
+*
+!.gitignore
+!Registro de predios en campo (VF-ES)v11.html
