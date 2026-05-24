@@ -2281,7 +2281,7 @@
         ${state.inboxBannerDismissed ? '' : `
         <div id="inbox-offline-banner" class="banner" style="background: var(--pale-green); border: 1px solid #B8DDE8; border-color: rgba(63, 152, 79, 0.3); margin-bottom: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px;">
           <svg style="flex-shrink: 0; color: var(--green-dark); margin-top: 1px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <div style="flex: 1; color: var(--navy);"><b>Modo offline listo.</b> Cuando salgas a campo sin red, podrás ver el mapa y capturar predios sin problemas. Todo se sincroniza cuando vuelvas a tener conexión.</div>
+          <div style="flex: 1; color: var(--navy);"><b>Modo offline listo.</b> Cuando salgas a campo sin red, podrás ver el mapa y capturar parcelas sin problemas. Todo se sincroniza cuando vuelvas a tener conexión.</div>
           <button id="inbox-banner-close" style="background:none;border:none;color:var(--gray);cursor:pointer;padding:0;font-size:18px;line-height:1;flex-shrink:0" aria-label="Cerrar">✕</button>
         </div>
         `}
@@ -2305,7 +2305,7 @@
       html += `
         <div class="banner banner-warn" style="margin-top:-6px">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M12 17V3M5 10l7 7 7-7M5 21h14"/></svg>
-          <div><b>Descarga el paquete B4BLite_Offline</b> de cada predio antes de cerrar la app. El paquete (.json) contiene M0 + M1 Lite + M2 Offline y se importa en B4B web vía «Nuevo proyecto».</div>
+          <div><b>Descarga el paquete B4BLite_Offline</b> de cada parcela antes de cerrar la app. El paquete (.json) contiene M0 + M1 Lite + M2 Offline y se importa en B4B web vía «Nuevo proyecto».</div>
         </div>
         
       `;
@@ -2464,7 +2464,7 @@
     const p = state.predios.find(x => x.predio_uuid === uuid);
     if (!p) return;
     const ok = await confirmDialog({
-      title: '¿Eliminar predio?',
+      title: '¿Eliminar parcela?',
       message: `Se eliminará <b>${p.nombre_finca || p.nombre_productor || p.predio_codigo}</b> de la bandeja. Asegúrate de haberlo exportado antes. Esta acción no se puede deshacer.`,
       confirm: 'Eliminar',
       cancel: 'Cancelar',
@@ -2474,7 +2474,7 @@
     await dbDel('predios', uuid);
     state.predios = state.predios.filter(x => x.predio_uuid !== uuid);
     render();
-    toast('Predio eliminado');
+    toast('Parcela eliminada');
   }
 
   // ---- Form: Progress + helpers ----
@@ -2530,7 +2530,7 @@
         <div class="field">
           <label class="field-label" for="f-doc">Documento de identidad<span class="req">*</span></label>
           <input class="input" id="f-doc" maxlength="20" inputmode="numeric" value="${d.documento_identidad || ''}" placeholder="DNI / RUC / pasaporte" list="dl-doc">
-          <p class="field-helper">Sirve para vincular varios predios a un mismo productor.</p>
+          <p class="field-helper">Sirve para vincular varias parcelas a un mismo productor.</p>
         </div>
         <div class="field">
           <label class="field-label" for="f-email">Correo electrónico<span class="req">*</span></label>
@@ -2751,7 +2751,7 @@
     $('#btn-poly').addEventListener('click', () => setView('polygon'));
     if ($('#btn-poly-clear')) {
       $('#btn-poly-clear').addEventListener('click', async () => {
-        const ok = await confirmDialog({ title: '¿Quitar polígono?', message: 'Solo quedará la coordenada del predio.', confirm: 'Quitar', danger: true });
+        const ok = await confirmDialog({ title: '¿Quitar polígono?', message: 'Solo quedará la coordenada de la parcela.', confirm: 'Quitar', danger: true });
         if (!ok) return;
         state.draft.poligono = null;
         viewStep2();
@@ -2894,7 +2894,7 @@
       totalEl.classList.toggle('error', invalid);
       cafeEl.classList.toggle('error', invalid);
       if (invalid) {
-        errBox.textContent = `El área en café (${cafe} ha) no puede ser mayor que el área total del predio (${total} ha).`;
+        errBox.textContent = `El área en café (${cafe} ha) no puede ser mayor que el área total de la parcela (${total} ha).`;
       }
       return !invalid;
     }
@@ -3068,7 +3068,7 @@
     `;
     setActionBar(`
       <button class="btn btn-secondary" id="sum-back">Atrás</button>
-      <button class="btn btn-success" id="sum-save">Guardar predio</button>
+      <button class="btn btn-success" id="sum-save">Guardar parcela</button>
     `);
     $view().querySelectorAll('[data-jump]').forEach(el => {
       el.addEventListener('click', e => { e.preventDefault(); setView(el.dataset.jump); });
@@ -3090,7 +3090,7 @@
   async function cancelDraft() {
     const ok = await confirmDialog({
       title: '¿Cancelar captura?',
-      message: 'Vas a perder los datos ingresados de este predio.',
+      message: 'Vas a perder los datos ingresados de esta parcela.',
       confirm: 'Sí, cancelar',
       cancel: 'Volver',
       danger: true
@@ -3111,8 +3111,8 @@
     const certs = p.certificaciones?.length ? p.certificaciones.join(' · ') : 'sin certificaciones registradas';
     $view().innerHTML = `
       <p class="h-kicker">M1 Lite · Offline</p>
-      <h1 class="h-title">${p.nombre_finca || 'Predio sin nombre'}</h1>
-      <p class="h-sub">Lectura de campo basada en M0. El análisis satelital completo se ejecuta cuando el predio se sincronice en B4B online.</p>
+      <h1 class="h-title">${p.nombre_finca || 'Parcela sin nombre'}</h1>
+      <p class="h-sub">Lectura de campo basada en M0. El análisis satelital completo se ejecuta cuando la parcela se sincronice en B4B online.</p>
       <div class="banner banner-warn">
         <div><b>Pendiente de conexión:</b> hábitat, buffers, multitemporal, biomasa y frameworks regulatorios.</div>
       </div>
@@ -3207,7 +3207,7 @@
     const cash = offCashflow(inp);
     $view().innerHTML = `
       <p class="h-kicker">B4BLite_Offline · M2</p>
-      <h1 class="h-title">${p.nombre_finca || 'Predio sin nombre'}</h1>
+      <h1 class="h-title">${p.nombre_finca || 'Parcela sin nombre'}</h1>
       <p class="h-sub">Conversación pedagógica con la familia. El extensionista registra qué escenario le gustaría explorar para que luego B4B lo corra y prepare un reporte económico y de naturaleza.</p>
       <div class="banner banner-warn">
         <div><b>Mensaje para la familia:</b> estas elecciones no son una promesa de resultado. Se precargan en B4B para analizarlas y traer una propuesta en la siguiente reunión.</div>
@@ -3789,6 +3789,7 @@
     });
 
     state.cachedMapZone = (await dbGet('config', 'mapZone')).value;
+    state.noTilesWarning = false;
     return combinedResult;
   }
 
@@ -3837,7 +3838,7 @@
           </div>
           <div class="precision-zones-header-text">
             <p class="precision-zones-header-title">Zonas de alta precisión <span style="font-weight: 400; color: var(--gray);">(opcional)</span></p>
-            <p class="precision-zones-header-sub" id="precision-zones-header-sub">Si conoces el predio exacto, agrega una zona con zoom hasta z18 para ver bordes con claridad.</p>
+            <p class="precision-zones-header-sub" id="precision-zones-header-sub">Si conoces la zona exacta, agrega una zona con zoom hasta z18 para ver bordes con claridad.</p>
           </div>
           <svg class="precision-zones-chevron" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
@@ -4044,7 +4045,7 @@
       if (precisionZones.length === 0) {
         $list.innerHTML = '';
         if ($empty) $empty.style.display = 'block';
-        if ($headerSub) $headerSub.textContent = 'Si conocés el predio exacto, agregá una zona con zoom hasta z18 para ver bordes con claridad.';
+        if ($headerSub) $headerSub.textContent = 'Si conocés la zona exacta, agregá una zona con zoom hasta z18 para ver bordes con claridad.';
       } else {
         if ($empty) $empty.style.display = 'none';
         $list.innerHTML = precisionZones.map(z => {
@@ -4106,7 +4107,7 @@
       modal.innerHTML =
         '<div class="zone-add-content">' +
           '<h3>Agregar zona de alta precisión</h3>' +
-          '<p class="zone-add-sub">Definí el centro del predio. Solo podés hacerlo ahora con internet.</p>' +
+          '<p class="zone-add-sub">Definí el centro de la zona. Solo podés hacerlo ahora con internet.</p>' +
           '<div class="zone-add-method-tabs">' +
             '<button class="zone-add-method-tab" data-method="map">Tap en mapa</button>' +
             '<button class="zone-add-method-tab" data-method="coords">Coordenadas</button>' +
@@ -4115,7 +4116,7 @@
           '<div id="zone-add-method-body"></div>' +
           '<div class="field" style="margin: 12px 0;">' +
             '<label class="field-label" for="zone-add-name">Nombre (opcional)</label>' +
-            '<input type="text" class="input" id="zone-add-name" placeholder="Ej: Predio Exabiel" maxlength="40">' +
+            '<input type="text" class="input" id="zone-add-name" placeholder="Ej: Zona Exabiel" maxlength="40">' +
           '</div>' +
           '<div class="zone-add-slider-row">' +
             '<label>Radio de la zona <span id="zone-add-radius-label">5 km</span></label>' +
@@ -4143,7 +4144,7 @@
         const body = modal.querySelector('#zone-add-method-body');
         if (m === 'map') {
           body.innerHTML = '<div class="zone-add-mini-map" id="zone-add-mini-map"></div>' +
-            '<p style="font-size: 11px; color: var(--gray); margin: 4px 0 12px;">Toca el mapa para marcar el centro del predio. Mapa satelital activado.</p>';
+            '<p style="font-size: 11px; color: var(--gray); margin: 4px 0 12px;">Toca el mapa para marcar el centro de la zona. Mapa satelital activado.</p>';
           setTimeout(initMiniMap, 50);
         } else if (m === 'coords') {
           body.innerHTML = '<div class="zone-add-coords-row">' +
@@ -4416,7 +4417,7 @@
               <p class="precision-zone-item-name">${escapeHtmlSimple(z.name)}</p>
               <p class="precision-zone-item-meta">${z.lat.toFixed(4)}, ${z.lng.toFixed(4)} · radio ${z.radiusKm} km · z11–${z.zMax} · ~${tiles.toLocaleString('es-PE')} tiles · ~${mb} MB</p>
             </div>
-            <button class="precision-zone-item-remove" data-remove="${z.id}" aria-label="Quitar predio">×</button>
+            <button class="precision-zone-item-remove" data-remove="${z.id}" aria-label="Quitar zona">×</button>
           </div>`;
         }).join('');
         $list.querySelectorAll('[data-remove]').forEach(btn => {
@@ -4532,10 +4533,10 @@
         try { nudgeShown = !!localStorage.getItem('precisionMultipleZonesHint'); } catch(_){}
         if (!nudgeShown) {
           const cont = await confirmDialog({
-            title: '¿Vas solo a un predio hoy?',
-            message: 'Si visitarás varios predios hoy, puedes agregar hasta 5 zonas ahora con internet. En campo, sin conexión, ya no podrás definir nuevas zonas.',
+            title: '¿Vas solo a una zona hoy?',
+            message: 'Si visitarás varias zonas hoy, puedes agregar hasta 5 zonas ahora con internet. En campo, sin conexión, ya no podrás definir nuevas zonas.',
             confirm: 'Sí, solo voy a 1',
-            cancel: 'Agregar más predios'
+            cancel: 'Agregar más zonas'
           });
           try { localStorage.setItem('precisionMultipleZonesHint', '1'); } catch(_){}
           if (!cont) return;
@@ -4586,8 +4587,8 @@
       ).join('');
       modal.innerHTML =
         '<div class="zone-add-content">' +
-          '<h3>Agregar predio</h3>' +
-          '<p class="zone-add-sub">Define el centro del predio. Solo puedes hacerlo ahora con internet.</p>' +
+          '<h3>Agregar zona</h3>' +
+          '<p class="zone-add-sub">Define el centro de la zona. Solo puedes hacerlo ahora con internet.</p>' +
           '<div class="zone-add-method-tabs">' +
             '<button class="zone-add-method-tab" data-method="map">Tap en mapa</button>' +
             '<button class="zone-add-method-tab" data-method="coords">Coordenadas</button>' +
@@ -4595,7 +4596,7 @@
           '</div>' +
           '<div id="zone-add-method-body"></div>' +
           '<div class="field" style="margin: 12px 0;">' +
-            '<label class="field-label" for="zone-add-name">Nombre del predio (opcional)</label>' +
+            '<label class="field-label" for="zone-add-name">Nombre de la zona (opcional)</label>' +
             '<input type="text" class="input" id="zone-add-name" placeholder="Ej: Finca Exabiel" maxlength="40">' +
           '</div>' +
           '<div class="zone-add-slider-row">' +
@@ -4610,7 +4611,7 @@
           '<div class="zone-add-estimate" id="zone-add-estimate">Define el centro para calcular el estimado.</div>' +
           '<div class="zone-add-actions">' +
             '<button class="btn btn-ghost" id="zone-add-cancel">Cancelar</button>' +
-            '<button class="btn btn-success" id="zone-add-confirm" disabled>Agregar predio</button>' +
+            '<button class="btn btn-success" id="zone-add-confirm" disabled>Agregar zona</button>' +
           '</div>' +
         '</div>';
       document.body.appendChild(modal);
@@ -4624,7 +4625,7 @@
         const body = modal.querySelector('#zone-add-method-body');
         if (m === 'map') {
           body.innerHTML = '<div class="zone-add-mini-map" id="zone-add-mini-map"></div>' +
-            '<p style="font-size: 11px; color: var(--gray); margin: 4px 0 12px;">Toca el mapa para marcar el centro del predio. Mapa satelital activado.</p>';
+            '<p style="font-size: 11px; color: var(--gray); margin: 4px 0 12px;">Toca el mapa para marcar el centro de la zona. Mapa satelital activado.</p>';
           setTimeout(initMiniMap, 50);
         } else if (m === 'coords') {
           body.innerHTML = '<div class="zone-add-coords-row">' +
@@ -5202,7 +5203,7 @@
         ${zones.map((z, i) => `
           <div class="zones-menu-item ${i===currentIdx?'current':''}" data-idx="${i}">
             <div class="zones-menu-item-info">
-              <p class="zones-menu-item-name">${String(z.name || 'Predio ' + (i+1)).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}${i===currentIdx?' <span style="font-size:10px;color:var(--green-dark);font-weight:400">· acá estás</span>':''}</p>
+              <p class="zones-menu-item-name">${String(z.name || 'Zona ' + (i+1)).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}${i===currentIdx?' <span style="font-size:10px;color:var(--green-dark);font-weight:400">· acá estás</span>':''}</p>
               <p class="zones-menu-item-meta">${z.lat.toFixed(4)}, ${z.lng.toFixed(4)} · radio ${z.radiusKm} km · z11–${z.zMax}</p>
             </div>
           </div>
